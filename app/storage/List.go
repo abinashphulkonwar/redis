@@ -124,6 +124,7 @@ func (list *List) RRemove() {
 	tail.Prev = nil
 
 }
+
 func (list *List) LRemove() {
 
 	if list.Length == 0 {
@@ -143,6 +144,25 @@ func (list *List) LRemove() {
 	head.Next.Prev = nil
 	list.head = head.Next
 	head.Next = nil
+
+}
+
+func (list *List) LGet() (interface{}, uint8) {
+
+	if list.Length == 0 {
+		return nil, 0
+	}
+
+	return list.head.Value, 1
+
+}
+func (list *List) RGet() (interface{}, uint8) {
+
+	if list.Length == 0 {
+		return nil, 0
+	}
+
+	return list.tail.Value, 1
 
 }
 
