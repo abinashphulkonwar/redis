@@ -8,9 +8,12 @@ import (
 )
 
 const (
-	LIST   = "LSET"
-	TEXT   = "SET"
-	NUMBER = "SET"
+	LIST    = "LSET"
+	TEXT    = "SET"
+	NUMBER  = "SET"
+	C_LPUSH = "LPUSH"
+	C_RPUSH = "RPUSH"
+	C_SET   = "SET"
 )
 
 func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
@@ -18,7 +21,7 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 
 		buf := c.Body()
 
-		body := storage.Data{}
+		body := storage.RequestBody{}
 
 		err := json.Unmarshal(buf, &body)
 
@@ -27,7 +30,7 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 		}
 
 		if body.Type == LIST {
-			return ListHandler(c, &body)
+			return ListHandler(c, &body, queue)
 		}
 
 		return c.JSON(fiber.Map{
@@ -37,9 +40,12 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 	return handler
 }
 
-func ListHandler(c *fiber.Ctx, body *storage.Data) error {
-
+func ListHandler(c *fiber.Ctx, body *storage.RequestBody, queue *storage.Queue) error {
+	queue.Insert(storage.DBCommands{
+		Connection: c,
+		Payload:    body,
+	})
 	return c.JSON(fiber.Map{
-		"status": "ok",
+		"status": "done",
 	})
 }

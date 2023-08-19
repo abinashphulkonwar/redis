@@ -3,7 +3,7 @@ package storage
 import "github.com/gofiber/fiber/v2"
 
 type DBCommands struct {
-	Payload    RequestBody
+	Payload    *RequestBody
 	Connection *fiber.Ctx
 }
 
@@ -13,8 +13,18 @@ func DBCommandsHandler(queue *Queue) {
 		val, isFound := queue.Get()
 		if isFound {
 			data := val.(DBCommands)
-			Set(data.Payload.Key, &data.Payload.Data)
+			if data.Payload != nil {
+				Set(data.Payload.Key, &data.Payload.Data)
+			}
 			queue.Remove()
+
+			// if data.Connection != nil {
+			// 	println("🚀")
+			// 	data.Connection.JSON(fiber.Map{
+			// 		"status": "done",
+			// 	})
+			// }
+
 		}
 	}
 }
