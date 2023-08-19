@@ -8,6 +8,10 @@ type Data struct {
 	EX         int
 	IfNotExist bool
 }
+type RequestBody struct {
+	Data Data
+	Key  string
+}
 
 var hMap = sync.Map{}
 
