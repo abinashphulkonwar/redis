@@ -13,24 +13,28 @@ const (
 	NUMBER = "SET"
 )
 
-func AddData(c *fiber.Ctx) error {
-	buf := c.Body()
+func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
+	handler := func(c *fiber.Ctx) error {
 
-	body := storage.Data{}
+		buf := c.Body()
 
-	err := json.Unmarshal(buf, &body)
+		body := storage.Data{}
 
-	if err != nil {
-		return err
+		err := json.Unmarshal(buf, &body)
+
+		if err != nil {
+			return err
+		}
+
+		if body.Type == LIST {
+			return ListHandler(c, &body)
+		}
+
+		return c.JSON(fiber.Map{
+			"status": "ok",
+		})
 	}
-
-	if body.Type == LIST {
-		return ListHandler(c, &body)
-	}
-
-	return c.JSON(fiber.Map{
-		"status": "ok",
-	})
+	return handler
 }
 
 func ListHandler(c *fiber.Ctx, body *storage.Data) error {
