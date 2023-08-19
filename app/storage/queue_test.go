@@ -12,36 +12,40 @@ func TestQueue(T *testing.T) {
 	asysc := sync.WaitGroup{}
 	asysc.Add(2)
 	var queue_value []int
+	mx := sync.Mutex{}
+
 	go func() {
+		defer asysc.Done()
 
 		for {
+			mx.Lock()
 
 			data, isFound := queue.Get()
-
 			if isFound {
 				queue.Remove()
 				switch v := data.(type) {
 				case int:
-					println(v)
 					queue_value = append(queue_value, v)
 					if v == 1000 {
+						mx.Unlock()
 
-						asysc.Done()
-
+						return
 					}
 
 				}
 			}
-
+			mx.Unlock()
 		}
 
 	}()
-	mx := sync.Mutex{}
+	for i := 1; i <= 1000; i++ {
+		queue.Insert(i)
+	}
 	go func() {
+		defer asysc.Done()
 		for {
-
+			mx.Lock()
 			if len(queue_value) == 1000 {
-				mx.Lock()
 
 				println("length :", len(queue_value))
 
@@ -49,21 +53,18 @@ func TestQueue(T *testing.T) {
 					if i != queue_value[i-1] {
 						println(i, queue_value[i-1])
 						mx.Unlock()
-						asysc.Done()
 						T.Errorf("un ordered")
+						return
 					}
 				}
 				println("done")
-				asysc.Done()
-				mx.Unlock()
-
+				return
 			}
+			mx.Unlock()
 
 		}
 	}()
-	for i := 1; i <= 1000; i++ {
-		queue.Insert(i)
-	}
+
 	asysc.Wait()
 
 }
