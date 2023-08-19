@@ -3,17 +3,9 @@ package handler
 import (
 	"encoding/json"
 
+	"github.com/abinashphulkonwar/redis/commands"
 	"github.com/abinashphulkonwar/redis/storage"
 	"github.com/gofiber/fiber/v2"
-)
-
-const (
-	LIST    = "LSET"
-	TEXT    = "SET"
-	NUMBER  = "SET"
-	C_LPUSH = "LPUSH"
-	C_RPUSH = "RPUSH"
-	C_SET   = "SET"
 )
 
 func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
@@ -29,7 +21,8 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 			return err
 		}
 
-		if body.Type == LIST {
+		if body.Type == commands.LSET {
+
 			return ListHandler(c, &body, queue)
 		}
 
@@ -41,11 +34,11 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 }
 
 func ListHandler(c *fiber.Ctx, body *storage.RequestBody, queue *storage.Queue) error {
-	queue.Insert(storage.DBCommands{
+
+	queue.Insert(&storage.DBCommands{
 		Connection: c,
 		Payload:    body,
 	})
-	return c.JSON(fiber.Map{
-		"status": "done",
-	})
+
+	return c.JSON(body.Data)
 }

@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/abinashphulkonwar/redis/api"
-	"github.com/abinashphulkonwar/redis/api/handler"
+	"github.com/abinashphulkonwar/redis/commands"
 	"github.com/abinashphulkonwar/redis/storage"
 )
 
@@ -22,8 +22,8 @@ func TestApp(t *testing.T) {
 			Value: "🚀",
 			EX:    100000,
 		},
-		Type:       handler.LIST,
-		Commands:   handler.C_RPUSH,
+		Type:       commands.LSET,
+		Commands:   commands.C_LPUSH,
 		IfNotExist: true,
 	}
 	data, err := json.Marshal(body)
@@ -44,7 +44,7 @@ func TestApp(t *testing.T) {
 	println(resp.StatusCode, string(res))
 	stored_data, isFound := storage.Get("id")
 	if isFound {
-		switch v := stored_data.(type) {
+		switch v := stored_data.Value.(type) {
 		case string:
 			fmt.Println(string(res), v)
 		default:
