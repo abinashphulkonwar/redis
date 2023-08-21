@@ -30,6 +30,7 @@ func (list *List) isPointer(value interface{}) bool {
 
 func (list *List) dataTypeCheck(value interface{}) bool {
 	if list.isPointer(value) {
+		println("List Unsupported type pointer")
 		return false
 	}
 	switch value.(type) {
