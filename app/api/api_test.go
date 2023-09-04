@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http/httptest"
 	"testing"
 
@@ -77,5 +78,50 @@ func TestApp(t *testing.T) {
 		default:
 			fmt.Println("Stored data is not a string")
 		}
+	}
+}
+
+func TestNumber(t *testing.T) {
+	queue := storage.InitQueue()
+	go storage.DBCommandsHandler(queue)
+	key := "number:key"
+	body := storage.RequestBody{
+		Key: key,
+		Data: storage.Data{
+			Value: 8923938,
+			EX:    100000,
+		},
+		Type:       commands.NUMBER,
+		Commands:   commands.NUMBER,
+		IfNotExist: true,
+	}
+	data := GetJson(body)
+	req := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(data))
+	body.Data.Value = 8772476
+	req1 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
+	app := api.App(queue)
+
+	respons, _ := app.Test(req)
+	_, _ = app.Test(req1)
+
+	res, _ := io.ReadAll(respons.Body)
+	println("status code: ", respons.StatusCode, "body: ", string(res))
+	stored_data, isFound := storage.Get(key)
+	println("is found: ", isFound)
+	if isFound {
+		println("type: ", stored_data.Type, "EX: ", stored_data.EX)
+		switch data := stored_data.Value.(type) {
+		case *storage.List:
+			println(data.Length)
+			data.Travers()
+		case string:
+			println(data)
+		case int:
+			println(data)
+		default:
+			fmt.Println("Stored data is not a string")
+		}
+	} else {
+		t.Error("number is not set")
 	}
 }
