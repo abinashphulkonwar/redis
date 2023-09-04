@@ -17,10 +17,14 @@ func DBCommandsHandler(queue *Queue) {
 		if isFound {
 			data := val.(*DBCommands)
 			if data.Payload != nil {
-				if data.Payload.Type == commands.LSET {
+
+				switch data.Payload.Type {
+				case commands.LSET:
 					ListProcessor(data)
+					Set(data.Payload.Key, &data.Payload.Data)
+				case commands.TEXT:
+					TextHandler(data)
 				}
-				Set(data.Payload.Key, &data.Payload.Data)
 			}
 			queue.Remove()
 
@@ -34,4 +38,15 @@ func DBCommandsHandler(queue *Queue) {
 
 		}
 	}
+}
+
+func TextHandler(data *DBCommands) {
+
+	_, isFound := Get(data.Payload.Key)
+
+	if (!isFound && data.Payload.IfNotExist) || (isFound && !data.Payload.IfNotExist) {
+		data.Payload.Data.Type = data.Payload.Type
+		Set(data.Payload.Key, &data.Payload.Data)
+	}
+
 }
