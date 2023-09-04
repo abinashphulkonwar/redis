@@ -18,7 +18,6 @@ func AddValToList(data *DBCommands, list *List) {
 func ListProcessor(data *DBCommands) {
 
 	listRef, isFound := Get(data.Payload.Key)
-	var list *List = nil
 
 	if data.Payload.IfNotExist && listRef != nil {
 		println("data.Payload.IfNotExist")
@@ -28,6 +27,8 @@ func ListProcessor(data *DBCommands) {
 		return
 	}
 
+	var list *List = nil
+
 	if isFound {
 		if listRef.Type == commands.LSET {
 			list = listRef.Value.(*List)
@@ -36,7 +37,6 @@ func ListProcessor(data *DBCommands) {
 		}
 	} else {
 		list = Init()
-
 	}
 	AddValToList(data, list)
 	data.Payload.Data.Value = list

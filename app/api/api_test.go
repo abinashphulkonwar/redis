@@ -45,11 +45,19 @@ func TestApp(t *testing.T) {
 	body.Commands = commands.C_RPUSH
 	body.IfNotExist = true
 	req2 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
+	body.Type = commands.TEXT
+	println(body.Type, "type")
+	req3 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
+	body.Data.Value = "data 🚀"
+	body.IfNotExist = false
+	req4 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
 
 	app := api.App(queue)
 	resp, err := app.Test(req)
 	_, _ = app.Test(req1)
 	_, _ = app.Test(req2)
+	_, _ = app.Test(req3)
+	_, _ = app.Test(req4)
 	if err != nil {
 		t.Errorf("Error adding key value pair " + err.Error())
 		return
@@ -58,12 +66,14 @@ func TestApp(t *testing.T) {
 	//res, _ := io.ReadAll(resp.Body)
 	println(resp.StatusCode)
 	stored_data, isFound := storage.Get("id")
+	println("is found: ", isFound, "type: ", stored_data.Type, "EX: ", stored_data.EX)
 	if isFound {
 		switch data := stored_data.Value.(type) {
 		case *storage.List:
-			println(stored_data.Type)
-
+			println(data.Length)
 			data.Travers()
+		case string:
+			println(data)
 		default:
 			fmt.Println("Stored data is not a string")
 		}
