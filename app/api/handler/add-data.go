@@ -20,25 +20,26 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-
-		if body.Type == commands.LSET {
-
-			return ListHandler(c, &body, queue)
+		switch body.Type {
+		case commands.LSET:
+			InsertToQueue(c, &body, queue)
+		case commands.TEXT:
+			InsertToQueue(c, &body, queue)
 		}
 
 		return c.JSON(fiber.Map{
 			"status": "ok",
+			"body":   body.Data,
 		})
 	}
 	return handler
 }
 
-func ListHandler(c *fiber.Ctx, body *storage.RequestBody, queue *storage.Queue) error {
+func InsertToQueue(c *fiber.Ctx, body *storage.RequestBody, queue *storage.Queue) {
 
 	queue.Insert(&storage.DBCommands{
 		Connection: c,
 		Payload:    body,
 	})
 
-	return c.JSON(body.Data)
 }
