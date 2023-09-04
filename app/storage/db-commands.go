@@ -24,6 +24,8 @@ func DBCommandsHandler(queue *Queue) {
 					Set(data.Payload.Key, &data.Payload.Data)
 				case commands.TEXT:
 					TextProcessor(data)
+				case commands.NUMBER:
+					NumberProcessor(data)
 				}
 			}
 			queue.Remove()
