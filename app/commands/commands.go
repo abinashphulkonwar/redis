@@ -2,9 +2,9 @@ package commands
 
 const (
 	LSET    = "LSET"
-	TEXT    = "SET"
+	TEXT    = "T_SET"
 	NUMBER  = "SET"
 	C_LPUSH = "LPUSH"
 	C_RPUSH = "RPUSH"
-	C_SET   = "SET"
+	C_SET   = "C_SET"
 )
