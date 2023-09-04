@@ -23,7 +23,7 @@ func DBCommandsHandler(queue *Queue) {
 					ListProcessor(data)
 					Set(data.Payload.Key, &data.Payload.Data)
 				case commands.TEXT:
-					TextHandler(data)
+					TextProcessor(data)
 				}
 			}
 			queue.Remove()
@@ -38,15 +38,4 @@ func DBCommandsHandler(queue *Queue) {
 
 		}
 	}
-}
-
-func TextHandler(data *DBCommands) {
-
-	_, isFound := Get(data.Payload.Key)
-
-	if (!isFound && data.Payload.IfNotExist) || (isFound && !data.Payload.IfNotExist) {
-		data.Payload.Data.Type = data.Payload.Type
-		Set(data.Payload.Key, &data.Payload.Data)
-	}
-
 }
