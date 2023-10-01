@@ -29,6 +29,7 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 		case commands.NUMBER:
 			intVal, isInt := body.Data.Value.(int)
 			floatVal, isFloat := body.Data.Value.(float64)
+
 			if !isInt && !isFloat {
 				return fiber.NewError(fiber.StatusUnprocessableEntity, "value of 'type' 'number' key should be int")
 			}

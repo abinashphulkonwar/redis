@@ -10,5 +10,6 @@ func App(queue *storage.Queue) *fiber.App {
 	app := fiber.New()
 
 	app.Route("/api/write", routes.InsertHandler(queue))
+	app.Route("/api/query", routes.QueryHandler(queue))
 	return app
 }
