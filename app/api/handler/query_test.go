@@ -1,13 +1,15 @@
 package handler_test
 
 import (
-	"strings"
 	"testing"
+
+	"github.com/abinashphulkonwar/redis/api/handler"
 )
 
 func TestStrimgHandler(t *testing.T) {
-	val := strings.Trim(" sjdnkjsnakd sajkjnf\n      ", " \n\t\r")
-	println(val, "hjshj")
-	commands := strings.Split(val, " ")
-	println(commands[0], commands[1])
+	command, err := handler.GetCommands(" set sjdnkjsnakd sajkjnf ahjsbdjsad hjsabdjbadj akjhjsbdjasbdj                    jsdhkjnfkjnkjd\n      ")
+	if err != nil {
+		t.Error(err)
+	}
+	println(command.Command, command.Key, command.Value, command.EX, command.IF_NOT)
 }
