@@ -7,4 +7,6 @@ const (
 	C_LPUSH = "LPUSH"
 	C_RPUSH = "RPUSH"
 	C_SET   = "C_SET"
+	GET     = "GET"
+	SET     = "SET"
 )
