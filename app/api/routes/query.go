@@ -8,7 +8,7 @@ import (
 
 func QueryHandler(queue *storage.Queue) func(router fiber.Router) {
 	router := func(router fiber.Router) {
-		router.Get("/GET", handler.AddData(queue))
+		router.Get("/GET", handler.GetQuery(queue))
 	}
 	return router
 }
