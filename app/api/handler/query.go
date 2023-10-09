@@ -22,9 +22,14 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
 		}
 
+		data, isFound := storage.Get(query_struct.Key)
+		if !isFound {
+			return fiber.NewError(fiber.StatusNotFound, "data not found")
+		}
+
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status": "Success",
-			"query":  query_struct,
+			"query":  data,
 		})
 	}
 	return handler

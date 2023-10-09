@@ -20,6 +20,7 @@ type RequestBody struct {
 var hMap = sync.Map{}
 
 func Get(key string) (*Data, bool) {
+
 	data, isFound := hMap.Load(key)
 	if !isFound {
 		return nil, false
