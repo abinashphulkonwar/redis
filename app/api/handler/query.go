@@ -18,8 +18,15 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 		}
 
 		query_struct, err := service.GetCommands(query)
+
 		if err != nil {
 			return fiber.NewError(fiber.StatusUnprocessableEntity, err.Error())
+		}
+
+		isValid, message := query_struct.ValidateGet()
+
+		if !isValid {
+			return fiber.NewError(fiber.StatusUnprocessableEntity, message)
 		}
 
 		data, isFound := storage.Get(query_struct.Key)

@@ -16,7 +16,10 @@ type Command struct {
 	IF_NOT  bool
 }
 
-func (c *Command) validateGet() (bool, string) {
+func (c *Command) ValidateGet() (bool, string) {
+	if c.Command != commands.GET {
+		return false, "Not a valid command"
+	}
 	if c.Key == "" {
 		return false, "Key is undefined"
 	}
@@ -28,7 +31,7 @@ func (c *Command) Validate() (bool, string) {
 	case commands.SET:
 		return true, ""
 	case commands.GET:
-		return c.validateGet()
+		return c.ValidateGet()
 	}
 
 	return false, "Unvalid command"
