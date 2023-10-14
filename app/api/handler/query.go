@@ -34,9 +34,23 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusNotFound, "data not found")
 		}
 
+		if data.Type == storage.StringType || data.Type == storage.IntType {
+
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{
+				"status": "Success",
+				"data":   data.Value,
+			})
+		}
+		if data.Type == storage.ListType {
+
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{
+				"status": "Success_List_Type",
+				"data":   "List Type",
+			})
+		}
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"status": "Success",
-			"query":  data,
+			"status": "Error",
+			"data":   nil,
 		})
 	}
 	return handler
