@@ -4,12 +4,6 @@ import (
 	"sync"
 )
 
-const (
-	StringType = "string"
-	IntType    = "int"
-	ListType   = "list"
-)
-
 type Data struct {
 	Value interface{}
 	EX    int
