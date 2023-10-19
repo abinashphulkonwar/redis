@@ -33,7 +33,6 @@ func TestApp(t *testing.T) {
 			Value: "🚀",
 			EX:    100000,
 		},
-		Type:       commands.LSET,
 		Commands:   commands.C_LPUSH,
 		IfNotExist: true,
 	}
@@ -46,8 +45,6 @@ func TestApp(t *testing.T) {
 	body.Commands = commands.C_RPUSH
 	body.IfNotExist = true
 	req2 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
-	body.Type = commands.TEXT
-	println(body.Type, "type")
 	req3 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
 	body.Data.Value = "data 🚀"
 	body.IfNotExist = false
@@ -91,7 +88,6 @@ func TestNumber(t *testing.T) {
 			Value: 8923938,
 			EX:    100000,
 		},
-		Type:       commands.NUMBER,
 		Commands:   commands.NUMBER,
 		IfNotExist: true,
 	}
