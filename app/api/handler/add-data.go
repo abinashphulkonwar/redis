@@ -21,7 +21,7 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 			return err
 		}
 
-		switch body.Type {
+		switch body.Commands {
 		case commands.LSET:
 			return InsertToQueue(c, &body, queue)
 		case commands.TEXT:
