@@ -19,27 +19,31 @@ func ListProcessor(data *DBCommands) {
 
 	listRef, isFound := Get(data.Payload.Key)
 
+	if isFound && data.Payload.IfNotExist {
+		return
+	}
+
 	if data.Payload.IfNotExist && listRef != nil {
 		println("data.Payload.IfNotExist")
 		data.Payload.Data.Value = listRef.Value
-		data.Payload.Data.Type = listRef.Type
+		data.Payload.Data.Type = commands.TYPE_LIST
 		data.Payload.Data.EX = listRef.EX
+		Set(data.Payload.Key, &data.Payload.Data)
 		return
 	}
 
 	var list *List = nil
 
-	if isFound {
-		if listRef.Type == commands.LSET {
-			list = listRef.Value.(*List)
-		} else {
-			list = Init()
-		}
+	if isFound && listRef.Type == commands.TYPE_LIST {
+		list = listRef.Value.(*List)
 	} else {
 		list = Init()
+
 	}
+
 	AddValToList(data, list)
 	data.Payload.Data.Value = list
 	data.Payload.Data.Type = commands.LSET
+	Set(data.Payload.Key, &data.Payload.Data)
 
 }
