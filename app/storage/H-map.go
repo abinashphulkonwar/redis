@@ -12,7 +12,6 @@ type Data struct {
 type RequestBody struct {
 	Data       Data
 	Key        string
-	Type       string
 	Commands   string
 	IfNotExist bool
 }
