@@ -18,10 +18,9 @@ func DBCommandsHandler(queue *Queue) {
 			data := val.(*DBCommands)
 			if data.Payload != nil {
 
-				switch data.Payload.Type {
+				switch data.Payload.Commands {
 				case commands.LSET:
 					ListProcessor(data)
-					Set(data.Payload.Key, &data.Payload.Data)
 				case commands.TEXT:
 					TextProcessor(data)
 				case commands.NUMBER:
