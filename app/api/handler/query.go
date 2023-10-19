@@ -43,45 +43,44 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 			return fiber.NewError(fiber.StatusNotFound, "data not found")
 		}
 
-		if data.Type == commands.TEXT || data.Type == commands.NUMBER {
-
+		if data.Type == commands.TYPE_STRING || data.Type == commands.TYPE_NUMBER {
 			return c.Status(fiber.StatusOK).JSON(fiber.Map{
 				"status": "Success",
 				"data":   data.Value,
 			})
-		}
+		} else if data.Type == commands.TYPE_LIST {
+			var list *storage.List
+			var val interface{}
+			var status uint8
+			switch query_struct.Command {
+			case commands.LSET:
+				return c.Status(fiber.StatusOK).JSON(fiber.Map{
+					"status":  "Success_List_Type",
+					"data":    "List Type",
+					"Is_LIST": true,
+				})
+			case commands.C_LGET:
+				list = data.Value.(*storage.List)
+				val, status = list.LGet()
+				if status == 0 {
+					return listError(c, "not found")
+				}
+				return c.Status(fiber.StatusOK).JSON(fiber.Map{
+					"status": "Success_List_Type",
+					"data":   val,
+				})
+			case commands.C_RGET:
+				list = data.Value.(*storage.List)
+				val, status = list.LGet()
+				if status == 0 {
+					return listError(c, "not found")
+				}
+				return c.Status(fiber.StatusOK).JSON(fiber.Map{
+					"status": "Success_List_Type",
+					"data":   val,
+				})
 
-		var list *storage.List
-		var val interface{}
-		var status uint8
-		switch query_struct.Command {
-		case commands.LSET:
-			return c.Status(fiber.StatusOK).JSON(fiber.Map{
-				"status":  "Success_List_Type",
-				"data":    "List Type",
-				"Is_LIST": true,
-			})
-		case commands.C_LGET:
-			list = data.Value.(*storage.List)
-			val, status = list.LGet()
-			if status == 0 {
-				return listError(c, "not found")
 			}
-			return c.Status(fiber.StatusOK).JSON(fiber.Map{
-				"status": "Success_List_Type",
-				"data":   val,
-			})
-		case commands.C_RGET:
-			list = data.Value.(*storage.List)
-			val, status = list.LGet()
-			if status == 0 {
-				return listError(c, "not found")
-			}
-			return c.Status(fiber.StatusOK).JSON(fiber.Map{
-				"status": "Success_List_Type",
-				"data":   val,
-			})
-
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
