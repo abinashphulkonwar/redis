@@ -5,10 +5,10 @@ import (
 )
 
 func AddValToList(data *DBCommands, list *List) {
-	if data.Payload.Commands == commands.C_LPUSH {
+	println("command:", data.Payload.Commands)
+	if data.Payload.Commands == commands.LPUSH {
 		println("list LPUSH")
 		list.LPush(data.Payload.Data.Value)
-
 	} else {
 		println("list RPUSH")
 		list.RPush(data.Payload.Data.Value)
@@ -43,7 +43,7 @@ func ListProcessor(data *DBCommands) {
 
 	AddValToList(data, list)
 	data.Payload.Data.Value = list
-	data.Payload.Data.Type = commands.LSET
+	data.Payload.Data.Type = commands.TYPE_LIST
 	Set(data.Payload.Key, &data.Payload.Data)
 
 }
