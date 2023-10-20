@@ -53,13 +53,7 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 			var val interface{}
 			var status uint8
 			switch query_struct.Command {
-			case commands.LSET:
-				return c.Status(fiber.StatusOK).JSON(fiber.Map{
-					"status":  "Success_List_Type",
-					"data":    "List Type",
-					"Is_LIST": true,
-				})
-			case commands.C_LGET:
+			case commands.LGET:
 				list = data.Value.(*storage.List)
 				val, status = list.LGet()
 				if status == 0 {
@@ -69,9 +63,9 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 					"status": "Success_List_Type",
 					"data":   val,
 				})
-			case commands.C_RGET:
+			case commands.RGET:
 				list = data.Value.(*storage.List)
-				val, status = list.LGet()
+				val, status = list.RGet()
 				if status == 0 {
 					return listError(c, "not found")
 				}
@@ -81,6 +75,11 @@ func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
 				})
 
 			}
+			return c.Status(fiber.StatusOK).JSON(fiber.Map{
+				"status":  "Success_List_Type",
+				"data":    "List Type",
+				"Is_LIST": true,
+			})
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
