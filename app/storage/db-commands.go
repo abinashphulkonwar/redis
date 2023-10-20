@@ -21,6 +21,10 @@ func DBCommandsHandler(queue *Queue) {
 				switch data.Payload.Commands {
 				case commands.LSET:
 					ListProcessor(data)
+				case commands.RPUSH:
+					ListProcessor(data)
+				case commands.LPUSH:
+					ListProcessor(data)
 				case commands.TEXT:
 					TextProcessor(data)
 				case commands.NUMBER:
