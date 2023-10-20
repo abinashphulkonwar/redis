@@ -1,16 +1,16 @@
 package commands
 
 const (
-	LSET    = "LSET"
-	TEXT    = "T_SET"
-	NUMBER  = "N_SET"
-	C_LPUSH = "LPUSH"
-	C_RPUSH = "RPUSH"
-	C_LGET  = "LGET"
-	C_RGET  = "RGET"
-	C_SET   = "C_SET"
-	GET     = "GET"
-	SET     = "SET"
+	LSET   = "LSET"
+	TEXT   = "TSET"
+	NUMBER = "NSET"
+	LPUSH  = "LPUSH"
+	RPUSH  = "RPUSH"
+	LGET   = "LGET"
+	RGET   = "RGET"
+	//	C_SET   = "C_SET"
+	GET = "GET"
+	SET = "SET"
 )
 
 const (
