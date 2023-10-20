@@ -33,7 +33,7 @@ func TestApp(t *testing.T) {
 			Value: "🚀",
 			EX:    100000,
 		},
-		Commands:   commands.C_LPUSH,
+		Commands:   commands.LPUSH,
 		IfNotExist: true,
 	}
 	data := GetJson(body)
@@ -42,7 +42,7 @@ func TestApp(t *testing.T) {
 	body.IfNotExist = false
 	req1 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
 	body.Data.Value = "add new data"
-	body.Commands = commands.C_RPUSH
+	body.Commands = commands.RPUSH
 	body.IfNotExist = true
 	req2 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
 	req3 := httptest.NewRequest("POST", "/api/write/add", bytes.NewReader(GetJson(body)))
