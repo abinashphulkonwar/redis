@@ -17,24 +17,36 @@ type Command struct {
 }
 
 func (c *Command) ValidateGet() (bool, string) {
-	if c.Command != commands.GET {
-		return false, "Not a valid command"
+	switch c.Command {
+	case commands.GET:
+		return true, ""
+	case commands.LGET:
+		return true, ""
+	case commands.RGET:
+		return true, ""
 	}
-	if c.Key == "" {
-		return false, "Key is undefined"
-	}
-	return true, ""
+	return false, "not a valid GET method"
 }
-func (c *Command) Validate() (bool, string) {
-
+func (c *Command) ValidateSet() (bool, string) {
 	switch c.Command {
 	case commands.SET:
 		return true, ""
-	case commands.GET:
-		return c.ValidateGet()
+	}
+	return false, "not a valid SET method"
+}
+
+func (c *Command) Validate() (bool, string) {
+	if c.Key == "" {
+		return false, "Key is undefined"
 	}
 
-	return false, "Unvalid command"
+	isGet, _ := c.ValidateGet()
+	isSet, _ := c.ValidateGet()
+
+	if !isGet && !isSet {
+		return false, "Unvalid command"
+	}
+	return true, ""
 }
 
 func GetCommands(arg string) (*Command, error) {
