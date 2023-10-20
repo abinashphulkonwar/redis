@@ -24,6 +24,10 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 		switch body.Commands {
 		case commands.LSET:
 			return InsertToQueue(c, &body, queue)
+		case commands.LPUSH:
+			return InsertToQueue(c, &body, queue)
+		case commands.RPUSH:
+			return InsertToQueue(c, &body, queue)
 		case commands.TEXT:
 			return InsertToQueue(c, &body, queue)
 		case commands.NUMBER:
