@@ -1,7 +1,9 @@
 package service
 
 import (
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
+	"fmt"
 	"os"
 	"sync"
 
@@ -37,6 +39,9 @@ func InitLogger(path string) *Logger {
 }
 
 func (l *Logger) open() {
+	if l.file != nil {
+		return
+	}
 	file, err := os.OpenFile(l.file_path, os.O_APPEND, 0666)
 
 	if err != nil {
@@ -46,10 +51,31 @@ func (l *Logger) open() {
 
 }
 
+func (l *Logger) Read() {
+	l.open()
+	defer l.close()
+	buf := make([]byte, 10000)
+
+	_, err := l.file.Read(buf)
+	if err != nil {
+		panic(err)
+	}
+
+	dec := gob.NewDecoder(bytes.NewBuffer(buf))
+	var log Log
+	err = dec.Decode(&log)
+	if err != nil {
+		panic(err)
+	}
+	println(log.Key, log.Value)
+
+}
+
 func (l *Logger) close() {
 	if l.file != nil {
 		l.file.Close()
 	}
+	l.file = nil
 }
 
 func (l *Logger) start() {
@@ -70,13 +96,16 @@ func (l *Logger) start() {
 			continue
 		}
 		val = 0
-		curruent := node.(*Log)
-		data, err := json.Marshal(&curruent)
-		if err != nil {
-			println(err.Error())
+
+		current := node.(*Log)
+		buf := new(bytes.Buffer)
+		enc := gob.NewEncoder(buf)
+		if err := enc.Encode(*current); err != nil {
+			fmt.Println(err)
 		}
-		println(curruent.Key)
-		size, err := l.file.Write(data)
+
+		println(current.Key)
+		size, err := l.file.Write(buf.Bytes())
 		if err != nil {
 			println(err.Error())
 		}
