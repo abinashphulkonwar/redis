@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fmt"
+	"io"
 	"os"
 	"sync"
 
@@ -56,18 +57,56 @@ func (l *Logger) Read() {
 	defer l.close()
 	buf := make([]byte, 10000)
 
-	_, err := l.file.Read(buf)
+	n, err := l.file.Read(buf)
 	if err != nil {
 		panic(err)
 	}
+	println(n)
+	start := string(buf[0:18])
 
-	dec := gob.NewDecoder(bytes.NewBuffer(buf))
-	var log Log
-	err = dec.Decode(&log)
-	if err != nil {
-		panic(err)
+	itr := 0
+	for {
+
+		if n <= 0 {
+			break
+		}
+		log_buf := make([]byte, 4000)
+		isStart := true
+		index := 0
+		for {
+
+			length := index + 18
+			if index > n {
+				break
+			}
+			if length > n {
+				log_buf[index] = buf[index]
+				index++
+			}
+			if string(buf[index:length]) == start && !isStart {
+				break
+			}
+			isStart = false
+			log_buf[index] = buf[index]
+			index++
+		}
+		buf = buf[index:]
+		n = n - index
+
+		dec := gob.NewDecoder(bytes.NewBuffer(log_buf))
+		var log Log
+		err := dec.Decode(&log)
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			panic(err)
+		}
+		fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
+		println(n)
+
+		itr++
+
 	}
-	println(log.Key, log.Value)
 
 }
 
