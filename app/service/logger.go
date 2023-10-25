@@ -55,7 +55,55 @@ func (l *Logger) open() {
 func (l *Logger) Read() {
 	l.open()
 	defer l.close()
-	buf := make([]byte, 10000)
+	buf := make([]byte, 100)
+	start_buf := make([]byte, 18)
+
+	n, err := l.file.Read(start_buf)
+	if err != nil {
+		panic(err)
+	}
+	//start := string(start_buf)
+	// original:  W��♥☺☺♥Log☺��☺☺♦Time☺♀☺♠Status☺♀☺♦Path☺♀☺♠Method☺♀☺Command☺♀☺♥Key☺♀☺♣Value☺♀����☺'1970-03-06 09:25:41.127841057 +0000 UTC☺♥416☺2http://www.principalevolve.com/deploy/dynamic/rich☺♣PATCH☺♂Collins6408☺♀Silas Abbott☺♀Prosacco9939
+	// getting:  W��♥☺☺♥Log☺��☺☺♦Time☺♀☺♠Status☺♀☺♦Path☺♀☺♠Method☺♀☺Command☺♀☺♥Key☺♀☺♣Value☺♀����☺'1970-03-06 09:25:41.127841057 +0000 UTC☺♥416☺2http://www.principalevolve.com/deploy/dynamic/rich☺♣PATCH☺♂Collins6408☺♀Silas Abbott☺♀Prosacco9939
+	prev := n
+	n, err = l.file.Read(buf)
+	if err != nil {
+		panic(err)
+	}
+	log_buf := make([]byte, 10000)
+	copy(log_buf[0:18], start_buf)
+
+	copy(log_buf[prev:n+prev], buf)
+	prev = n + prev
+	n, err = l.file.Read(buf)
+	if err != nil {
+		panic(err)
+	}
+	copy(log_buf[prev:n+prev], buf)
+	prev = n + prev
+	n, err = l.file.Read(buf)
+	if err != nil {
+		panic(err)
+	}
+	copy(log_buf[prev:n+prev], buf)
+	println(prev)
+
+	dec := gob.NewDecoder(bytes.NewBuffer(log_buf))
+	var log Log
+	err = dec.Decode(&log)
+	if err == io.EOF {
+		println(err.Error())
+	} else if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
+
+}
+
+func (l *Logger) ReadLacacy() {
+	l.open()
+	defer l.close()
+	buf := make([]byte, 100)
 
 	n, err := l.file.Read(buf)
 	if err != nil {
@@ -64,35 +112,86 @@ func (l *Logger) Read() {
 	println(n)
 	start := string(buf[0:18])
 
-	itr := 0
+	itr := -1
+	log_buf := make([]byte, 4000)
+	index := 0
+	isEnd := false
+	isStart := true
+	bytes_read := n
+	isNot_Ending_Log := false
+	currentLenght := 0
 	for {
-
-		if n <= 0 {
+		if itr == 3 {
 			break
 		}
-		log_buf := make([]byte, 4000)
-		isStart := true
-		index := 0
+		if n <= 0 || isEnd {
+			break
+		}
+		isDone := false
+		itr++
+
 		for {
 
 			length := index + 18
-			if index > n {
-				break
+			if isNot_Ending_Log {
+				max := currentLenght
+				if currentLenght < n {
+					max = n
+				}
+				if index >= max {
+					break
+				}
+			} else {
+				if index >= n {
+					break
+				}
 			}
 			if length > n {
 				log_buf[index] = buf[index]
 				index++
+				continue
+			}
+			if itr == 1 {
+				println(string(buf[index:length]), start)
+			}
+
+			if string(buf[index:length]) == start {
+				println("done", isDone, n, index)
 			}
 			if string(buf[index:length]) == start && !isStart {
+				isDone = true
+				isNot_Ending_Log = false
 				break
 			}
 			isStart = false
+			isNot_Ending_Log = true
 			log_buf[index] = buf[index]
 			index++
+			currentLenght++
 		}
 		buf = buf[index:]
 		n = n - index
+		if !isDone {
+			var a [100]byte
+			buf = a[0:]
 
+			n_size, err := l.file.ReadAt(buf, int64(bytes_read))
+			if err != nil {
+				if err == io.EOF {
+					isEnd = true
+				} else {
+					panic(err)
+				}
+
+			} else {
+				println("size", n_size, string(buf))
+				n = n_size
+				bytes_read = bytes_read + n
+				continue
+			}
+		}
+
+		println("data")
 		dec := gob.NewDecoder(bytes.NewBuffer(log_buf))
 		var log Log
 		err := dec.Decode(&log)
@@ -103,8 +202,11 @@ func (l *Logger) Read() {
 		}
 		fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
 		println(n)
-
-		itr++
+		index = 0
+		var a [4000]byte
+		log_buf = a[0:]
+		isStart = true
+		currentLenght = 0
 
 	}
 
