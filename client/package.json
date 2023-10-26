@@ -1,0 +1,19 @@
+{
+  "name": "go-redis-client",
+  "version": "1.0.0",
+  "description": "client library for go redis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "abinash phulkonwar",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "type": "module"
+}
