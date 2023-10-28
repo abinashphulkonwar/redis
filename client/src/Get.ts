@@ -26,8 +26,14 @@ export const Get = async ({
       data: string;
       Is_LIST?: boolean;
     };
+    console.log(res);
     return res;
   }
   const res = (await request.json()) as unknown as ErrorInterface;
   throw new RedisClientError(res);
 };
+
+Get({
+  Key: "key",
+  Command: "GET",
+});

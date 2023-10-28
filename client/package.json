@@ -4,16 +4,18 @@
   "description": "client library for go redis",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "ts-node --esm ./src/Get.ts"
   },
   "author": "abinash phulkonwar",
   "license": "ISC",
   "devDependencies": {
+    "@types/node-fetch": "^2.6.7",
     "jest": "^29.7.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "type": "module"
+    "node-fetch": "2"
+  }
 }
