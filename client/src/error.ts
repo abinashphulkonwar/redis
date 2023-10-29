@@ -3,6 +3,7 @@ export interface ErrorInterface {
   data: null;
   message: string;
 }
+
 export class RedisClientError extends Error {
   status: string;
   data: null;

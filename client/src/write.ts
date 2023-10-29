@@ -29,8 +29,21 @@ export const Write = async (event: {
       };
       status: string;
     };
+    console.log(res);
+
     return res;
   }
   const res = (await request.json()) as unknown as ErrorInterface;
+  console.log(res);
   throw new RedisClientError(res);
 };
+
+Write({
+  Data: {
+    value: "🚀",
+    EX: 0,
+  },
+  Key: "key",
+  Commands: "TSET",
+  IfNotExist: false,
+});
