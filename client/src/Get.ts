@@ -1,13 +1,14 @@
 import fetch from "node-fetch";
 import { GetConfig } from "./init";
 import { ErrorInterface, RedisClientError } from "./error";
+import { commands } from "./types";
 
 export const Get = async ({
   Key,
   Command,
 }: {
   Key: string;
-  Command: string;
+  Command: commands;
 }) => {
   const config = GetConfig();
   const request = await fetch(
@@ -32,8 +33,3 @@ export const Get = async ({
   const res = (await request.json()) as unknown as ErrorInterface;
   throw new RedisClientError(res);
 };
-
-Get({
-  Key: "key",
-  Command: "GET",
-});

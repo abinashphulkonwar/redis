@@ -1,6 +1,7 @@
 import fetch from "node-fetch";
 import { GetConfig } from "./init";
 import { ErrorInterface, RedisClientError } from "./error";
+import { commands } from "./types";
 
 export const Write = async (event: {
   Data: {
@@ -8,7 +9,7 @@ export const Write = async (event: {
     EX?: number;
   };
   Key: string;
-  Commands: string;
+  Commands: commands;
   IfNotExist: boolean;
 }) => {
   const config = GetConfig();
@@ -37,13 +38,3 @@ export const Write = async (event: {
   console.log(res);
   throw new RedisClientError(res);
 };
-
-Write({
-  Data: {
-    value: "🚀",
-    EX: 0,
-  },
-  Key: "key",
-  Commands: "TSET",
-  IfNotExist: false,
-});

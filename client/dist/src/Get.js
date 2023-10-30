@@ -33,7 +33,3 @@ const Get = ({ Key, Command, }) => __awaiter(void 0, void 0, void 0, function* (
     throw new error_1.RedisClientError(res);
 });
 exports.Get = Get;
-(0, exports.Get)({
-    Key: "key",
-    Command: "GET",
-});
