@@ -52,6 +52,58 @@ func (l *Logger) open() {
 
 }
 
+func (l *Logger) ReadLogs() {
+	l.open()
+	defer l.close()
+	start_buf := make([]byte, 18)
+	n, err := l.file.Read(start_buf)
+	if err != nil {
+		panic(err)
+	}
+	position := n
+	current_buf := make([]byte, 10000)
+	copy(current_buf[0:18], start_buf)
+	for {
+		buf := make([]byte, 200)
+		n, err := l.file.Read(buf)
+		if err != nil {
+			println(err.Error())
+			break
+		}
+		index_buf := bytes.Index(buf, start_buf)
+		if index_buf != -1 {
+			copy(current_buf[position:position+index_buf], buf)
+			dec := gob.NewDecoder(bytes.NewBuffer(current_buf))
+			current_buf = make([]byte, 10000)
+			copy(current_buf[0:], buf[index_buf:])
+			var log Log
+			err = dec.Decode(&log)
+			if err == io.EOF {
+				println(err.Error())
+			} else if err != nil {
+				panic(err)
+			}
+			fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
+
+			position = n - index_buf
+		} else {
+			copy(current_buf[position:position+n], buf)
+			position = position + n
+		}
+	}
+	dec := gob.NewDecoder(bytes.NewBuffer(current_buf))
+
+	var log Log
+	err = dec.Decode(&log)
+	if err == io.EOF {
+		println(err.Error())
+	} else if err != nil {
+		panic(err)
+	}
+	fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
+
+}
+
 func (l *Logger) Read() {
 	l.open()
 	defer l.close()
@@ -62,9 +114,6 @@ func (l *Logger) Read() {
 	if err != nil {
 		panic(err)
 	}
-	//start := string(start_buf)
-	// original:  W��♥☺☺♥Log☺��☺☺♦Time☺♀☺♠Status☺♀☺♦Path☺♀☺♠Method☺♀☺Command☺♀☺♥Key☺♀☺♣Value☺♀����☺'1970-03-06 09:25:41.127841057 +0000 UTC☺♥416☺2http://www.principalevolve.com/deploy/dynamic/rich☺♣PATCH☺♂Collins6408☺♀Silas Abbott☺♀Prosacco9939
-	// getting:  W��♥☺☺♥Log☺��☺☺♦Time☺♀☺♠Status☺♀☺♦Path☺♀☺♠Method☺♀☺Command☺♀☺♥Key☺♀☺♣Value☺♀����☺'1970-03-06 09:25:41.127841057 +0000 UTC☺♥416☺2http://www.principalevolve.com/deploy/dynamic/rich☺♣PATCH☺♂Collins6408☺♀Silas Abbott☺♀Prosacco9939
 	prev := n
 	n, err = l.file.Read(buf)
 	if err != nil {
