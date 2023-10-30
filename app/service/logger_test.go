@@ -27,5 +27,5 @@ func TestLoggerWrite(t *testing.T) {
 func TestLoggerRead(t *testing.T) {
 	os.Setenv("mode", "Test")
 	logger := service.InitLogger("log")
-	logger.Read()
+	logger.ReadLogs()
 }
