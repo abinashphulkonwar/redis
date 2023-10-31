@@ -73,17 +73,10 @@ func (l *Logger) ReadLogs() {
 		index_buf := bytes.Index(buf, start_buf)
 		if index_buf != -1 {
 			copy(current_buf[position:position+index_buf], buf)
-			dec := gob.NewDecoder(bytes.NewBuffer(current_buf))
+			l.read(&current_buf)
+
 			current_buf = make([]byte, 10000)
 			copy(current_buf[0:], buf[index_buf:])
-			var log Log
-			err = dec.Decode(&log)
-			if err == io.EOF {
-				println(err.Error())
-			} else if err != nil {
-				panic(err)
-			}
-			fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
 
 			position = n - index_buf
 		} else {
@@ -91,55 +84,16 @@ func (l *Logger) ReadLogs() {
 			position = position + n
 		}
 	}
-	dec := gob.NewDecoder(bytes.NewBuffer(current_buf))
-
-	var log Log
-	err = dec.Decode(&log)
-	if err == io.EOF {
-		println(err.Error())
-	} else if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
+	l.read(&current_buf)
 
 }
 
-func (l *Logger) Read() {
-	l.open()
-	defer l.close()
-	buf := make([]byte, 100)
-	start_buf := make([]byte, 18)
+func (l *Logger) read(current_buf *[]byte) {
 
-	n, err := l.file.Read(start_buf)
-	if err != nil {
-		panic(err)
-	}
-	prev := n
-	n, err = l.file.Read(buf)
-	if err != nil {
-		panic(err)
-	}
-	log_buf := make([]byte, 10000)
-	copy(log_buf[0:18], start_buf)
+	dec := gob.NewDecoder(bytes.NewBuffer(*current_buf))
 
-	copy(log_buf[prev:n+prev], buf)
-	prev = n + prev
-	n, err = l.file.Read(buf)
-	if err != nil {
-		panic(err)
-	}
-	copy(log_buf[prev:n+prev], buf)
-	prev = n + prev
-	n, err = l.file.Read(buf)
-	if err != nil {
-		panic(err)
-	}
-	copy(log_buf[prev:n+prev], buf)
-	println(prev)
-
-	dec := gob.NewDecoder(bytes.NewBuffer(log_buf))
 	var log Log
-	err = dec.Decode(&log)
+	err := dec.Decode(&log)
 	if err == io.EOF {
 		println(err.Error())
 	} else if err != nil {
