@@ -1,7 +1,11 @@
 package storage
 
 import (
+	"time"
+
 	"github.com/abinashphulkonwar/redis/commands"
+	"github.com/abinashphulkonwar/redis/internalstorage"
+	"github.com/abinashphulkonwar/redis/service"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -10,7 +14,8 @@ type DBCommands struct {
 	Connection *fiber.Ctx
 }
 
-func DBCommandsHandler(queue *Queue) {
+func DBCommandsHandler(queue *internalstorage.Queue, logger *service.Logger) {
+
 	for {
 
 		val, isFound := queue.Get()
@@ -30,6 +35,15 @@ func DBCommandsHandler(queue *Queue) {
 				case commands.NUMBER:
 					NumberProcessor(data)
 				}
+				logger.Add(&service.Log{
+					Time:    time.Now().String(),
+					Status:  "success",
+					Path:    data.Connection.Path(),
+					Method:  data.Connection.Method(),
+					Command: data.Payload.Commands,
+					Key:     data.Payload.Key,
+					Value:   data.Payload.Data.Value.(string),
+				})
 			}
 			queue.Remove()
 
