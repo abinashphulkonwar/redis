@@ -8,7 +8,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/abinashphulkonwar/redis/storage"
+	"github.com/abinashphulkonwar/redis/internalstorage"
 )
 
 type Log struct {
@@ -25,12 +25,12 @@ type Logger struct {
 	file      *os.File
 	file_path string
 	wg        *sync.WaitGroup
-	queue     *storage.Queue
+	queue     *internalstorage.Queue
 }
 
 func InitLogger(path string) *Logger {
 	var wg sync.WaitGroup
-	queue := storage.InitQueue()
+	queue := internalstorage.InitQueue()
 	return &Logger{
 		file:      nil,
 		file_path: path,

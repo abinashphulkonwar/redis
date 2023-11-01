@@ -2,12 +2,12 @@ package api
 
 import (
 	"github.com/abinashphulkonwar/redis/api/routes"
-	"github.com/abinashphulkonwar/redis/storage"
+	"github.com/abinashphulkonwar/redis/internalstorage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
-func App(queue *storage.Queue) *fiber.App {
+func App(queue *internalstorage.Queue) *fiber.App {
 	app := fiber.New()
 
 	app.Use(logger.New())

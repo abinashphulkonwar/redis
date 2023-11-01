@@ -1,14 +1,14 @@
-package storage_test
+package internalstorage_test
 
 import (
 	"sync"
 	"testing"
 
-	"github.com/abinashphulkonwar/redis/storage"
+	"github.com/abinashphulkonwar/redis/internalstorage"
 )
 
 func TestQueue(T *testing.T) {
-	queue := storage.InitQueue()
+	queue := internalstorage.InitQueue()
 	asysc := sync.WaitGroup{}
 	asysc.Add(2)
 	var queue_value []int

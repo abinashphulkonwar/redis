@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 
 	"github.com/abinashphulkonwar/redis/commands"
+	"github.com/abinashphulkonwar/redis/internalstorage"
 	"github.com/abinashphulkonwar/redis/storage"
 	"github.com/gofiber/fiber/v2"
 )
 
-func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
+func AddData(queue *internalstorage.Queue) func(c *fiber.Ctx) error {
 	handler := func(c *fiber.Ctx) error {
 
 		buf := c.Body()
@@ -56,7 +57,7 @@ func AddData(queue *storage.Queue) func(c *fiber.Ctx) error {
 	return handler
 }
 
-func InsertToQueue(c *fiber.Ctx, body *storage.RequestBody, queue *storage.Queue) error {
+func InsertToQueue(c *fiber.Ctx, body *storage.RequestBody, queue *internalstorage.Queue) error {
 
 	queue.Insert(&storage.DBCommands{
 		Connection: c,

@@ -10,6 +10,8 @@ import (
 
 	"github.com/abinashphulkonwar/redis/api"
 	"github.com/abinashphulkonwar/redis/commands"
+	"github.com/abinashphulkonwar/redis/internalstorage"
+	"github.com/abinashphulkonwar/redis/service"
 	"github.com/abinashphulkonwar/redis/storage"
 )
 
@@ -25,8 +27,10 @@ func GetJson(body storage.RequestBody) []byte {
 }
 
 func TestApp(t *testing.T) {
-	queue := storage.InitQueue()
-	go storage.DBCommandsHandler(queue)
+	queue := internalstorage.InitQueue()
+	logger := service.InitLogger("log")
+	go logger.New()
+	go storage.DBCommandsHandler(queue, logger)
 	body := storage.RequestBody{
 		Key: "id",
 		Data: storage.Data{
@@ -79,8 +83,10 @@ func TestApp(t *testing.T) {
 }
 
 func TestNumber(t *testing.T) {
-	queue := storage.InitQueue()
-	go storage.DBCommandsHandler(queue)
+	queue := internalstorage.InitQueue()
+	logger := service.InitLogger("log")
+	go logger.New()
+	go storage.DBCommandsHandler(queue, logger)
 	key := "number:key"
 	body := storage.RequestBody{
 		Key: key,

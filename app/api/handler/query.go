@@ -5,6 +5,7 @@ import (
 
 	"github.com/abinashphulkonwar/redis/api/service"
 	"github.com/abinashphulkonwar/redis/commands"
+	"github.com/abinashphulkonwar/redis/internalstorage"
 	"github.com/abinashphulkonwar/redis/storage"
 	"github.com/gofiber/fiber/v2"
 )
@@ -17,7 +18,7 @@ func listError(c *fiber.Ctx, message string) error {
 	})
 }
 
-func GetQuery(queue *storage.Queue) func(c *fiber.Ctx) error {
+func GetQuery(queue *internalstorage.Queue) func(c *fiber.Ctx) error {
 	handler := func(c *fiber.Ctx) error {
 
 		query := c.Query("command")

@@ -20,6 +20,7 @@
 # Go workspace file
 go.work
 app/service/log
+app/log
 
 
 node_modules
