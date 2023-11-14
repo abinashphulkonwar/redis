@@ -52,9 +52,10 @@ func (l *Logger) open() {
 
 }
 
-func (l *Logger) ReadLogs() {
+func (l *Logger) ReadLogs() []*Log {
 	l.open()
 	defer l.close()
+	list := []*Log{}
 	start_buf := make([]byte, 18)
 	n, err := l.file.Read(start_buf)
 	if err != nil {
@@ -73,8 +74,8 @@ func (l *Logger) ReadLogs() {
 		index_buf := bytes.Index(buf, start_buf)
 		if index_buf != -1 {
 			copy(current_buf[position:position+index_buf], buf)
-			l.read(&current_buf)
-
+			log := l.read(&current_buf)
+			list = append(list, log)
 			current_buf = make([]byte, 10000)
 			copy(current_buf[0:], buf[index_buf:])
 
@@ -84,11 +85,12 @@ func (l *Logger) ReadLogs() {
 			position = position + n
 		}
 	}
-	l.read(&current_buf)
-
+	log := l.read(&current_buf)
+	list = append(list, log)
+	return list
 }
 
-func (l *Logger) read(current_buf *[]byte) {
+func (l *Logger) read(current_buf *[]byte) *Log {
 
 	dec := gob.NewDecoder(bytes.NewBuffer(*current_buf))
 
@@ -100,7 +102,7 @@ func (l *Logger) read(current_buf *[]byte) {
 		panic(err)
 	}
 	fmt.Printf("Log: Time=%v Path=%s Status=%s Method=%s Command=%s Key=%s Value=%s\n", log.Time, log.Path, log.Status, log.Method, log.Command, log.Key, log.Value)
-
+	return &log
 }
 
 func (l *Logger) ReadLacacy() {
@@ -263,8 +265,24 @@ func (l *Logger) Add(log *Log) {
 	l.queue.Insert(log)
 }
 
-func (l *Logger) New() {
+func (l *Logger) restore() {
+	list := l.ReadLogs()
+	for i := 0; i < len(list); i++ {
+		log := list[i]
+		println(log.Key, log.Value)
+		//var command storage.DBCommands
+		// command.Connection = nil
+		// command.Payload.Commands = log.Command
+		// command.Payload.Key = log.Key
+		// command.Payload.Data.Value = log.Value
+		// command.Payload.Data.Type = commands.TYPE_STRING
 
+		// l.queue.Insert(command)
+	}
+}
+
+func (l *Logger) New() {
+	l.restore()
 	l.open()
 	l.wg.Add(1)
 	go l.start()
