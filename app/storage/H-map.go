@@ -35,3 +35,7 @@ func Set(key string, data *Data) {
 	hMap.Store(key, data)
 
 }
+
+func Remove(Key string) {
+	hMap.Delete(Key)
+}
