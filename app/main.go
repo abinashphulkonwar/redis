@@ -13,5 +13,7 @@ func main() {
 	loger := service.InitLogger("log")
 	go loger.New()
 	go storage.DBCommandsHandler(queue, loger)
+	expireService := storage.InitExpireService()
+	go expireService.Start()
 	app.Listen(":3000")
 }
