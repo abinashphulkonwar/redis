@@ -1,3 +1,3 @@
-# redis
+# Redis
 
 It is a Redis-like, in-memory database implementation in Golang. This versatile database system accommodates three essential data types: integers, strings, and lists, allowing users to seamlessly interact with their data. In MemStore, data is stored with a unique key, enabling users to conveniently store information and retrieve it using these keys. Through intuitive commands such as SET, GET, NSET, NGET, LSET, LGET, RPUSH, LPUSH, LREMOVE, and RREMOVE, users can efficiently manage their data. The database also comes with an HTTP API to interact with the database and has its own key expiration service and memory safety.
