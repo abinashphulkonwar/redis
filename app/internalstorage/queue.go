@@ -68,7 +68,6 @@ func (q *Queue) Remove() bool {
 }
 
 func InitQueue() *Queue {
-	
 	return &Queue{
 		head:   nil,
 		Length: 0,
